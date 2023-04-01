@@ -37,6 +37,32 @@ async def on_ready():
 #                                                 ephemeral=True)
 
 
+@tree.command(name="verify", description="Verifies a user.", guild=discord.Object(id=os.getenv("GUILD_ID")))
+def verify(interaction, member: discord.Member):
+    if is_mod(interaction.user, interaction.guild):
+        # Assign roles to user
+
+        # Create transcript of ticket
+        await interaction.response.send_message(content="$transcript")
+
+        # Delete ticket
+        await interaction.response.send_message(content="$close")
+        await interaction.response.send_message(content="$delete")
+
+    else:
+        await interaction.response.send_message(content="```You don't have permission to use this command!```",
+                                                ephemeral=True)
+
+
+@tree.command(name="reject", description="Rejects a user.", guild=discord.Object(id=os.getenv("GUILD_ID")))
+def reject(interaction):
+    if is_mod(interaction.user, interaction.guild):
+        pass
+    else:
+        await interaction.response.send_message(content="```You don't have permission to use this command!```",
+                                                ephemeral=True)
+
+
 def is_mod(member, guild) -> bool:
     role = guild.get_role(939555760004812801)    # ID for Waiter role
     if role in member.roles:
