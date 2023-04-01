@@ -2,7 +2,7 @@ import os
 import discord
 from dotenv import load_dotenv
 from discord import app_commands
-from score_calculator.ScoreCalculator import ScoreCalculator
+# from score_calculator.ScoreCalculator import ScoreCalculator
 
 load_dotenv()
 
