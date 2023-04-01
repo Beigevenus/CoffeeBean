@@ -1,2 +1,2 @@
 # CoffeeBean
-A Discord moderation bot for a specific server.
+A moderation bot for a specific Discord server.
