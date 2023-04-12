@@ -1,2 +1,2 @@
 # CoffeeBean
-A moderation bot for a specific Discord server.
+An RP bot created for the Queer Café Discord server.
