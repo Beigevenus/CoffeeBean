@@ -1,5 +1,6 @@
 import os
 import discord
+import sqlite3
 from typing import Literal, get_args
 from dotenv import load_dotenv
 from discord import app_commands
@@ -30,12 +31,81 @@ async def poke(interaction):
 
 
 @tree.command(name="menu", description="Shows the café's menu.", guild=discord.Object(id=os.getenv("GUILD_ID")))
-async def menu(interaction, fancy: bool = True):
-    if fancy:
+async def menu(interaction, format: Literal["image", "text"] = "image"):
+    if format == "card":
         await interaction.response.send_message(file=discord.File(r"./resources/images/menu.jpg"), ephemeral=True)
-    else:
+    elif format == "text":
         await interaction.response.send_message(content=f"Here's a more *digestible* menu:\n{', '.join(menu_list)}",
                                                 ephemeral=True)
+
+
+@tree.command(name="add-intro", description="Saves a link to your intro for others to find easier.",
+              guild=discord.Object(id=os.getenv("GUILD_ID")))
+async def add_intro(interaction: discord.Interaction, message_id: str):
+    result = db_select(f"""
+    SELECT member_id FROM intro
+    WHERE member_id = {interaction.user.id};
+    """)
+
+    partial_msg = client.get_partial_messageable(interaction.channel_id)
+    try:
+        msg: discord.Message = await partial_msg.fetch_message(int(message_id))
+    except discord.errors.NotFound:
+        await interaction.response.send_message(content=f"I can't find a message with that ID!", ephemeral=True)
+    else:
+        if msg.author.id == interaction.user.id:
+            # Check if the invoker is the one who sent the intro message before doing anything
+            if result:
+                db_insert(f"""
+                UPDATE intro SET intro_link = '{msg.jump_url}' WHERE member_ID = {interaction.user.id}
+                """)
+                await interaction.response.send_message(content=f"Okay, I've updated that!", ephemeral=True)
+            else:
+                db_insert(f"""
+                INSERT INTO intro (member_id, intro_link) VALUES ({interaction.user.id}, '{msg.jump_url}')
+                """)
+                await interaction.response.send_message(content=f"Okay, I've added that!", ephemeral=True)
+        else:
+            await interaction.response.send_message(content=f"That message is not your intro, so I won't add it!",
+                                                    ephemeral=True)
+
+
+@tree.command(name="find-intro", description="Looks up an intro for the specified member.",
+              guild=discord.Object(id=os.getenv("GUILD_ID")))
+async def find_intro(interaction, member: discord.Member):
+    result = db_select(f"""
+        SELECT intro_link FROM intro
+        WHERE member_id = {member.id};
+        """)
+
+    if result:
+        await interaction.response.send_message(content=f"Here you go: {result[0][0]}", ephemeral=True)
+    else:
+        await interaction.response.send_message(content=f"Sorry, that member doesn't seem to have added an intro!",
+                                                ephemeral=True)
+
+
+# TODO: Implement table threads using Interaction.channel and TextChannel.create_thread()
+
+
+def db_select(query: str) -> list:
+    conn = sqlite3.connect(os.getenv("DB_PATH"))
+    cursor = conn.cursor()
+    cursor.execute(query)
+    results = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return results
+
+
+def db_insert(query: str):
+    conn = sqlite3.connect(os.getenv("DB_PATH"))
+    conn.execute(query)
+
+    conn.commit()
+    conn.close()
 
 
 client.run(os.getenv("TOKEN"))

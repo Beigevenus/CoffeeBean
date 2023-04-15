@@ -130,3 +130,6 @@ dmypy.json
 
 # Custom
 .idea
+.coffee_bean/db
+db.py
+*.db
