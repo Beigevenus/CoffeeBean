@@ -3,7 +3,7 @@ import discord
 import sqlite3
 from typing import Literal, get_args
 from dotenv import load_dotenv
-from queries import *
+from coffee_bean.db.queries import *
 
 load_dotenv()
 
@@ -24,7 +24,7 @@ async def on_ready():
     print("Ready!")
 
 
-# General commands
+# Core commands
 @tree.command(name="poke", description="Poke the bot to see if it's alive!",
               guild=discord.Object(id=os.getenv("GUILD_ID")))
 async def poke(interaction):
