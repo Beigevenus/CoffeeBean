@@ -1,5 +1,0 @@
-SELECT_MEMBER_ID = "SELECT member_id FROM member WHERE member_id = ?;"
-SELECT_INTRO_LINK = "SELECT intro_link FROM member WHERE member_id = ?;"
-UPDATE_INTRO_LINK = "UPDATE member SET intro_link = ? WHERE member_id = ?"
-INSERT_INTRO = "INSERT INTO member (member_id, intro_link) VALUES (?, ?)"
-INSERT_MEMBER = "INSERT INTO member (member_id) VALUES (?);"

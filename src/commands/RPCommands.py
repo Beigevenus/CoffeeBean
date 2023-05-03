@@ -2,8 +2,6 @@ from typing import Literal, get_args
 import discord
 from discord.ext import commands
 from discord import app_commands
-from coffee_bean.db.db_handler import *
-from coffee_bean.db.queries import *
 
 Menu = Literal["Bi-curious Bagel Bites", "Gender-bender Burger", "Grilled Queer-ini", "Non-binary Nachos",
                "Pogayto Salad", "Sapphic Skewers", "Louis' Twinky Tacos", "Nova's Space Dust", "Zoe's Snail Supremo",
@@ -13,7 +11,7 @@ menu_list: list[Menu] = list(get_args(Menu))
 
 
 class RPCommands(commands.Cog):
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot) -> None:
         self.bot = bot
 
     @app_commands.command(name="opt-in", description="Opt-in to all the fun RP stuff!")
@@ -50,9 +48,8 @@ class RPCommands(commands.Cog):
 
     # TODO: Implement table threads using Interaction.channel and TextChannel.create_thread()
 
-    @staticmethod
-    def is_opted_in(member_id: str) -> bool:
-        result = query_db(SELECT_MEMBER_ID, (member_id,))
+    def is_opted_in(self, member_id: str) -> bool:
+        result = self.bot.query_db(self.bot.SELECT_MEMBER_ID, (member_id,))
 
         if result:
             if result[0][0] == 0:
@@ -60,7 +57,7 @@ class RPCommands(commands.Cog):
             elif result[0][0] == 1:
                 return True
         else:
-            query_db(INSERT_MEMBER, (member_id,))
+            self.bot.query_db(self.bot.INSERT_MEMBER, (member_id,))
             return False
 
 
