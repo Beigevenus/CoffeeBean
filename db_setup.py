@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-conn = sqlite3.connect(os.getenv("DB_PATH"))
+conn = sqlite3.connect(f"src/{os.getenv('DB_PATH')}")
 
 conn.execute("""
 CREATE TABLE "member" (
